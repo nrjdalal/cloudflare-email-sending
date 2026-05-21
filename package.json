@@ -1,0 +1,17 @@
+{
+  "name": "cloudflare-email-sending",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260521.1",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.93.1"
+  }
+}
