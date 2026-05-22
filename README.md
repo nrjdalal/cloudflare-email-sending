@@ -1,4 +1,4 @@
-# cloudflare-email-sending
+# Cloudflare Email Sending
 
 Cloudflare Worker that sends emails from `<alias>@nrjdalal.com` to arbitrary recipients via [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
 
