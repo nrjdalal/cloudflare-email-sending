@@ -1,4 +1,4 @@
-name = "mailer"
+name = "cloudflare-email-sending"
 main = "src/index.ts"
 compatibility_date = "2026-05-21"
 compatibility_flags = ["nodejs_compat"]

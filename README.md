@@ -2,7 +2,7 @@
 
 Cloudflare Worker that sends emails from `<alias>@nrjdalal.com` to arbitrary recipients via [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
 
-Deployed to: `https://mailer.nd941z.workers.dev/send`
+Deployed to: `https://cloudflare-email-sending.nd941z.workers.dev/send`
 
 ## How it works
 
@@ -33,7 +33,7 @@ bun run deploy
 ## Send
 
 ```bash
-curl -X POST https://mailer.nd941z.workers.dev/send \
+curl -X POST https://cloudflare-email-sending.nd941z.workers.dev/send \
   -H "Authorization: Bearer $EMAIL_SENDING" \
   -H "Content-Type: application/json" \
   -d '{
