@@ -20,8 +20,8 @@ const count = (value?: unknown) =>
 const sendSchema = z
   .object({
     to: recipientSchema,
-    from_alias: aliasSchema,
-    from_name: z.string().optional(),
+    from_alias: aliasSchema.default("admin"),
+    from_name: z.string().default("Neeraj Dalal"),
     subject: z.string().min(1),
     html: z.string().optional(),
     text: z.string().optional(),

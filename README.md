@@ -60,19 +60,19 @@ Errors return `{ "error": { "code": "...", "message": "..." } }`:
 
 Fields follow the [Cloudflare Email Service](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/) message order (`from` is built server-side from `from_alias`/`from_name`).
 
-| field         | type                              | required           |
-| ------------- | --------------------------------- | ------------------ |
-| `to`          | `string \| EmailAddress \| (…)[]` | yes (max 50 total) |
-| `from_alias`  | `string` (`[a-z0-9._-]+`)         | yes                |
-| `from_name`   | `string`                          | no                 |
-| `subject`     | `string`                          | yes                |
-| `html`        | `string`                          | one of html/text   |
-| `text`        | `string`                          | one of html/text   |
-| `cc`          | `string \| EmailAddress \| (…)[]` | no                 |
-| `bcc`         | `string \| EmailAddress \| (…)[]` | no                 |
-| `reply_to`    | `string`                          | no                 |
-| `attachments` | `Attachment[]`                    | no (max 32)        |
-| `headers`     | `Record<string, string>`          | no                 |
+| field         | type                              | required                    |
+| ------------- | --------------------------------- | --------------------------- |
+| `to`          | `string \| EmailAddress \| (…)[]` | yes (max 50 total)          |
+| `from_alias`  | `string` (`[a-z0-9._-]+`)         | no (default `admin`)        |
+| `from_name`   | `string`                          | no (default `Neeraj Dalal`) |
+| `subject`     | `string`                          | yes                         |
+| `html`        | `string`                          | one of html/text            |
+| `text`        | `string`                          | one of html/text            |
+| `cc`          | `string \| EmailAddress \| (…)[]` | no                          |
+| `bcc`         | `string \| EmailAddress \| (…)[]` | no                          |
+| `reply_to`    | `string`                          | no                          |
+| `attachments` | `Attachment[]`                    | no (max 32)                 |
+| `headers`     | `Record<string, string>`          | no                          |
 
 `EmailAddress` is `{ email: string, name?: string }`. `Attachment` is `{ content, filename, type, disposition, contentId? }`, where `content` is a base64-encoded string and `disposition` is `"attachment" | "inline"`.
 
