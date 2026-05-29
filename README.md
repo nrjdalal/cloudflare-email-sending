@@ -6,8 +6,9 @@ Deployed to: `https://cloudflare-email-sending.nd941z.workers.dev/send`
 
 ## How it works
 
+- Built on [Hono](https://hono.dev) with `zod` + `@hono/standard-validator` for request validation.
 - Worker binds `env.EMAIL` to Cloudflare Email Service via `send_email` in `wrangler.jsonc`.
-- `POST /send` is gated by a `Bearer` shared secret (`EMAIL_SENDING`).
+- `POST /send` is gated by a `Bearer` shared secret (`EMAIL_SENDING`) via middleware.
 - The Worker interpolates `<from_alias>@nrjdalal.com` server-side — callers cannot spoof the domain.
 - SPF, DKIM, and DMARC are auto-configured by Cloudflare on the onboarded domain.
 
@@ -44,7 +45,14 @@ curl -X POST https://cloudflare-email-sending.nd941z.workers.dev/send \
   }'
 ```
 
-Response: `{ "ok": true, "from": "notes@nrjdalal.com", "to": "recipient@example.com" }`.
+Success: `{ "data": { "from": "notes@nrjdalal.com", "to": "recipient@example.com", "messageId": "..." } }`.
+
+Errors return `{ "error": { "code": "...", "message": "..." } }`:
+
+- `UNAUTHORIZED` (401) — missing or wrong bearer token
+- `VALIDATION_ERROR` (400) — invalid payload; includes `issues[]` from the schema
+- `SEND_FAILED` (502) — Email Service rejected the send; `code` mirrors the upstream error code
+- `NOT_FOUND` (404) — unknown route
 
 ## Request schema
 
