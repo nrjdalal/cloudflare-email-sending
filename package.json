@@ -2,16 +2,41 @@
   "name": "cloudflare-email-sending",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.com/nrjdalal/cloudflare-email-sending#readme",
+  "bugs": "https://github.com/nrjdalal/cloudflare-email-sending/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Neeraj Dalal",
+    "email": "admin@nrjdalal.com",
+    "url": "https://nrjdalal.com"
+  },
+  "repository": "nrjdalal/cloudflare-email-sending",
+  "funding": "https://github.com/sponsors/nrjdalal",
   "type": "module",
   "scripts": {
     "check-types": "tsc --noEmit",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "prepare": "lefthook install",
     "tail": "wrangler tail"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260521.1",
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "lefthook": "^2.1.8",
+    "lint-staged": "^17.0.5",
+    "oxfmt": "^0.51.0",
+    "oxlint": "^1.66.0",
     "typescript": "^5.7.2",
     "wrangler": "^4.93.1"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
