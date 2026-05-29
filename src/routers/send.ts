@@ -8,7 +8,9 @@ import {
   type EmailAddress,
   emailSchema,
   type Env,
+  messageSchema,
   recipientSchema,
+  sendResultSchema,
 } from "@/env"
 import { bearerAuth } from "@/middlewares"
 
@@ -77,20 +79,41 @@ export const sendRouter = new Hono<{ Bindings: Env }>().post(
       ? { email: `${from_alias}@${c.env.DOMAIN}`, name: from_name }
       : `${from_alias}@${c.env.DOMAIN}`
 
+    // Validate the server-built message; a misconfigured DOMAIN yields a bad `from`.
+    const built = messageSchema.safeParse({
+      to,
+      from,
+      subject,
+      ...(html ? { html } : {}),
+      ...(text ? { text } : {}),
+      ...(cc ? { cc } : {}),
+      ...(bcc ? { bcc } : {}),
+      ...(reply_to ? { replyTo: reply_to } : {}),
+      ...(attachments ? { attachments } : {}),
+      ...(headers ? { headers } : {}),
+    })
+    if (!built.success) {
+      return c.json(
+        { error: { code: "INVALID_MESSAGE", message: "Constructed message failed validation" } },
+        500,
+      )
+    }
+
     try {
-      const result = await c.env.EMAIL.send({
-        to,
-        from,
-        subject,
-        ...(html ? { html } : {}),
-        ...(text ? { text } : {}),
-        ...(cc ? { cc } : {}),
-        ...(bcc ? { bcc } : {}),
-        ...(reply_to ? { replyTo: reply_to } : {}),
-        ...(attachments ? { attachments } : {}),
-        ...(headers ? { headers } : {}),
-      })
-      return c.json({ data: { from, to, messageId: result.messageId } })
+      const result = await c.env.EMAIL.send(built.data)
+      const parsed = sendResultSchema.safeParse(result)
+      if (!parsed.success) {
+        return c.json(
+          {
+            error: {
+              code: "INVALID_UPSTREAM_RESPONSE",
+              message: "Email Service returned an unexpected response",
+            },
+          },
+          502,
+        )
+      }
+      return c.json({ data: { from, to, messageId: parsed.data.messageId } })
     } catch (err) {
       const { code, message } = err as { code?: string; message?: string }
       return c.json({ error: { code: code ?? "SEND_FAILED", message } }, 502)

@@ -25,23 +25,31 @@ export const attachmentSchema = z.object({
 })
 export type Attachment = z.infer<typeof attachmentSchema>
 
-export type EmailMessageBuilder = {
-  to: string | EmailAddress | (string | EmailAddress)[]
-  from: string | EmailAddress
-  subject: string
-  html?: string
-  text?: string
-  cc?: string | EmailAddress | (string | EmailAddress)[]
-  bcc?: string | EmailAddress | (string | EmailAddress)[]
-  replyTo?: string | EmailAddress
-  attachments?: Attachment[]
-  headers?: Record<string, string>
-}
+export const addressSchema = z.union([emailSchema, emailAddressSchema])
 
-export type EmailSendResult = {
-  messageId: string
-}
+export const messageSchema = z.object({
+  to: recipientSchema,
+  from: addressSchema,
+  subject: z.string(),
+  html: z.string().optional(),
+  text: z.string().optional(),
+  cc: recipientSchema.optional(),
+  bcc: recipientSchema.optional(),
+  replyTo: addressSchema.optional(),
+  attachments: z.array(attachmentSchema).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+})
+export type EmailMessageBuilder = z.infer<typeof messageSchema>
 
+export const sendResultSchema = z.object({
+  messageId: z.string(),
+})
+export type EmailSendResult = z.infer<typeof sendResultSchema>
+
+// EmailBinding is a live host object with a method — z.function exists to wrap
+// implementations via .implement(), not to model an external method in .parse(),
+// and c.env is injected by the runtime (never deserialized), so there is no
+// parse boundary. It stays a hand-written type.
 export type EmailBinding = {
   send(message: EmailMessageBuilder): Promise<EmailSendResult>
 }

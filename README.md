@@ -51,7 +51,9 @@ Errors return `{ "error": { "code": "...", "message": "..." } }`:
 
 - `UNAUTHORIZED` (401) — missing or wrong bearer token
 - `VALIDATION_ERROR` (400) — invalid payload; includes `issues[]` from the schema
+- `INVALID_MESSAGE` (500) — server-built message failed validation (e.g. misconfigured `DOMAIN`)
 - `SEND_FAILED` (502) — Email Service rejected the send; `code` mirrors the upstream error code
+- `INVALID_UPSTREAM_RESPONSE` (502) — Email Service returned an unexpected response shape
 - `NOT_FOUND` (404) — unknown route
 
 ## Request schema
