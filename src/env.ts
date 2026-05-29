@@ -10,6 +10,12 @@ export const emailAddressSchema = z.object({
 })
 export type EmailAddress = z.infer<typeof emailAddressSchema>
 
+export const recipientSchema = z.union([
+  emailSchema,
+  emailAddressSchema,
+  z.array(z.union([emailSchema, emailAddressSchema])).min(1),
+])
+
 export const attachmentSchema = z.object({
   content: z.union([z.string(), z.instanceof(ArrayBuffer)]),
   filename: z.string(),
@@ -20,16 +26,16 @@ export const attachmentSchema = z.object({
 export type Attachment = z.infer<typeof attachmentSchema>
 
 export interface EmailMessageBuilder {
-  to: string | string[] | EmailAddress | EmailAddress[]
+  to: string | EmailAddress | (string | EmailAddress)[]
   from: string | EmailAddress
   subject: string
-  text?: string
   html?: string
-  cc?: string | string[] | EmailAddress | EmailAddress[]
-  bcc?: string | string[] | EmailAddress | EmailAddress[]
+  text?: string
+  cc?: string | EmailAddress | (string | EmailAddress)[]
+  bcc?: string | EmailAddress | (string | EmailAddress)[]
   replyTo?: string | EmailAddress
-  headers?: Record<string, string>
   attachments?: Attachment[]
+  headers?: Record<string, string>
 }
 
 export interface EmailSendResult {
