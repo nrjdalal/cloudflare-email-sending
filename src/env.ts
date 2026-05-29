@@ -1,15 +1,23 @@
-export interface EmailAddress {
-  email: string
-  name?: string
-}
+import { z } from "zod"
 
-export interface Attachment {
-  content: string | ArrayBuffer
-  filename: string
-  type: string
-  disposition: "attachment" | "inline"
-  contentId?: string
-}
+export const aliasSchema = z.string().regex(/^[a-z0-9._-]+$/i)
+
+export const emailSchema = z.email()
+
+export const emailAddressSchema = z.object({
+  email: emailSchema,
+  name: z.string().optional(),
+})
+export type EmailAddress = z.infer<typeof emailAddressSchema>
+
+export const attachmentSchema = z.object({
+  content: z.union([z.string(), z.instanceof(ArrayBuffer)]),
+  filename: z.string(),
+  type: z.string(),
+  disposition: z.enum(["attachment", "inline"]),
+  contentId: z.string().optional(),
+})
+export type Attachment = z.infer<typeof attachmentSchema>
 
 export interface EmailMessageBuilder {
   to: string | string[] | EmailAddress | EmailAddress[]

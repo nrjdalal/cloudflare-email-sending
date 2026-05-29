@@ -2,38 +2,27 @@ import { sValidator } from "@hono/standard-validator"
 import { Hono } from "hono"
 import { z } from "zod"
 
-import type { EmailAddress, Env } from "@/env"
+import { aliasSchema, attachmentSchema, type EmailAddress, emailSchema, type Env } from "@/env"
 import { bearerAuth } from "@/middlewares"
 
-const recipients = z.union([z.email(), z.array(z.email()).min(1)])
+const recipients = z.union([emailSchema, z.array(emailSchema).min(1)])
 
 const count = (value?: string | string[]) =>
   value === undefined ? 0 : Array.isArray(value) ? value.length : 1
 
 const sendSchema = z
   .object({
-    from_alias: z.string().regex(/^[a-z0-9._-]+$/i),
+    from_alias: aliasSchema,
     from_name: z.string().optional(),
     to: recipients,
     cc: recipients.optional(),
     bcc: recipients.optional(),
-    reply_to: z.email().optional(),
+    reply_to: emailSchema.optional(),
     subject: z.string().min(1),
     text: z.string().optional(),
     html: z.string().optional(),
     headers: z.record(z.string(), z.string()).optional(),
-    attachments: z
-      .array(
-        z.object({
-          content: z.string(),
-          filename: z.string(),
-          type: z.string(),
-          disposition: z.enum(["attachment", "inline"]),
-          contentId: z.string().optional(),
-        }),
-      )
-      .max(32)
-      .optional(),
+    attachments: z.array(attachmentSchema).max(32).optional(),
   })
   .refine((body) => Boolean(body.text || body.html), {
     message: "one of text or html is required",
