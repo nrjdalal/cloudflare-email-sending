@@ -6,7 +6,7 @@ Deployed to: `https://cloudflare-email-sending.nd941z.workers.dev/send`
 
 ## How it works
 
-- Worker binds `env.EMAIL` to Cloudflare Email Service via `[[send_email]]` in `wrangler.toml`.
+- Worker binds `env.EMAIL` to Cloudflare Email Service via `send_email` in `wrangler.jsonc`.
 - `POST /send` is gated by a `Bearer` shared secret (`EMAIL_SENDING`).
 - The Worker interpolates `<from_alias>@nrjdalal.com` server-side — callers cannot spoof the domain.
 - SPF, DKIM, and DMARC are auto-configured by Cloudflare on the onboarded domain.
@@ -26,7 +26,7 @@ bunx wrangler login
 # Set the shared bearer secret used by clients
 printf %s 'your-long-random-secret' | bunx wrangler secret put EMAIL_SENDING
 
-# Update DOMAIN in wrangler.toml to your onboarded domain, then deploy
+# Update DOMAIN in wrangler.jsonc to your onboarded domain, then deploy
 bun run deploy
 ```
 

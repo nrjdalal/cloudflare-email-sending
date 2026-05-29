@@ -86,7 +86,19 @@ export default {
       return json({ error: "invalid_json" }, 400)
     }
 
-    const { from_alias, from_name, to, cc, bcc, reply_to, subject, text, html, headers, attachments } = body
+    const {
+      from_alias,
+      from_name,
+      to,
+      cc,
+      bcc,
+      reply_to,
+      subject,
+      text,
+      html,
+      headers,
+      attachments,
+    } = body
 
     if (!from_alias || !to || !subject || (!text && !html)) {
       return json(
@@ -129,7 +141,8 @@ export default {
       })
       return json({ ok: true, from, to, messageId: result.messageId })
     } catch (err) {
-      return json({ error: "send_failed", message: (err as Error).message }, 502)
+      const { code, message } = err as { code?: string; message?: string }
+      return json({ error: "send_failed", ...(code ? { code } : {}), message }, 502)
     }
   },
 }
