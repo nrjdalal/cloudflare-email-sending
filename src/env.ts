@@ -25,7 +25,7 @@ export const attachmentSchema = z.object({
 })
 export type Attachment = z.infer<typeof attachmentSchema>
 
-export interface EmailMessageBuilder {
+export type EmailMessageBuilder = {
   to: string | EmailAddress | (string | EmailAddress)[]
   from: string | EmailAddress
   subject: string
@@ -38,15 +38,15 @@ export interface EmailMessageBuilder {
   headers?: Record<string, string>
 }
 
-export interface EmailSendResult {
+export type EmailSendResult = {
   messageId: string
 }
 
-export interface EmailBinding {
+export type EmailBinding = {
   send(message: EmailMessageBuilder): Promise<EmailSendResult>
 }
 
-export interface Env {
+export type Env = {
   EMAIL: EmailBinding
   DOMAIN: string
   EMAIL_SENDING: string
