@@ -56,13 +56,23 @@ Errors return `{ "error": { "code": "...", "message": "..." } }`:
 
 ## Request schema
 
-| field        | type                      | required         |
-| ------------ | ------------------------- | ---------------- |
-| `from_alias` | `string` (`[a-z0-9._-]+`) | yes              |
-| `to`         | `string \| string[]`      | yes (max 50)     |
-| `subject`    | `string`                  | yes              |
-| `text`       | `string`                  | one of text/html |
-| `html`       | `string`                  | one of text/html |
+Fields follow the [Cloudflare Email Service](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/) message order (`from` is built server-side from `from_alias`/`from_name`).
+
+| field         | type                              | required           |
+| ------------- | --------------------------------- | ------------------ |
+| `to`          | `string \| EmailAddress \| (…)[]` | yes (max 50 total) |
+| `from_alias`  | `string` (`[a-z0-9._-]+`)         | yes                |
+| `from_name`   | `string`                          | no                 |
+| `subject`     | `string`                          | yes                |
+| `html`        | `string`                          | one of html/text   |
+| `text`        | `string`                          | one of html/text   |
+| `cc`          | `string \| EmailAddress \| (…)[]` | no                 |
+| `bcc`         | `string \| EmailAddress \| (…)[]` | no                 |
+| `reply_to`    | `string`                          | no                 |
+| `attachments` | `Attachment[]`                    | no (max 32)        |
+| `headers`     | `Record<string, string>`          | no                 |
+
+`EmailAddress` is `{ email: string, name?: string }`; `Attachment` is `{ content, filename, type, disposition, contentId? }`.
 
 ## Local dev
 

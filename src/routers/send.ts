@@ -2,27 +2,32 @@ import { sValidator } from "@hono/standard-validator"
 import { Hono } from "hono"
 import { z } from "zod"
 
-import { aliasSchema, attachmentSchema, type EmailAddress, emailSchema, type Env } from "@/env"
+import {
+  aliasSchema,
+  attachmentSchema,
+  type EmailAddress,
+  emailSchema,
+  type Env,
+  recipientSchema,
+} from "@/env"
 import { bearerAuth } from "@/middlewares"
 
-const recipients = z.union([emailSchema, z.array(emailSchema).min(1)])
-
-const count = (value?: string | string[]) =>
+const count = (value?: unknown) =>
   value === undefined ? 0 : Array.isArray(value) ? value.length : 1
 
 const sendSchema = z
   .object({
+    to: recipientSchema,
     from_alias: aliasSchema,
     from_name: z.string().optional(),
-    to: recipients,
-    cc: recipients.optional(),
-    bcc: recipients.optional(),
-    reply_to: emailSchema.optional(),
     subject: z.string().min(1),
-    text: z.string().optional(),
     html: z.string().optional(),
-    headers: z.record(z.string(), z.string()).optional(),
+    text: z.string().optional(),
+    cc: recipientSchema.optional(),
+    bcc: recipientSchema.optional(),
+    reply_to: emailSchema.optional(),
     attachments: z.array(attachmentSchema).max(32).optional(),
+    headers: z.record(z.string(), z.string()).optional(),
   })
   .refine((body) => Boolean(body.text || body.html), {
     message: "one of text or html is required",
@@ -55,17 +60,17 @@ export const sendRouter = new Hono<{ Bindings: Env }>().post(
   }),
   async (c) => {
     const {
+      to,
       from_alias,
       from_name,
-      to,
+      subject,
+      html,
+      text,
       cc,
       bcc,
       reply_to,
-      subject,
-      text,
-      html,
-      headers,
       attachments,
+      headers,
     } = c.req.valid("json")
 
     const from: EmailAddress | string = from_name
@@ -77,13 +82,13 @@ export const sendRouter = new Hono<{ Bindings: Env }>().post(
         to,
         from,
         subject,
-        ...(text ? { text } : {}),
         ...(html ? { html } : {}),
+        ...(text ? { text } : {}),
         ...(cc ? { cc } : {}),
         ...(bcc ? { bcc } : {}),
         ...(reply_to ? { replyTo: reply_to } : {}),
-        ...(headers ? { headers } : {}),
         ...(attachments ? { attachments } : {}),
+        ...(headers ? { headers } : {}),
       })
       return c.json({ data: { from, to, messageId: result.messageId } })
     } catch (err) {
