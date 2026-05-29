@@ -74,12 +74,23 @@ Fields follow the [Cloudflare Email Service](https://developers.cloudflare.com/e
 | `attachments` | `Attachment[]`                    | no (max 32)        |
 | `headers`     | `Record<string, string>`          | no                 |
 
-`EmailAddress` is `{ email: string, name?: string }`; `Attachment` is `{ content, filename, type, disposition, contentId? }`.
+`EmailAddress` is `{ email: string, name?: string }`. `Attachment` is `{ content, filename, type, disposition, contentId? }`, where `content` is a base64-encoded string and `disposition` is `"attachment" | "inline"`.
+
+## Project structure
+
+```
+src/
+  index.ts            # Hono app: onError, notFound, mounts the router
+  env.ts              # zod schemas (single source of truth) + inferred types + runtime binding types
+  lib/error.ts        # error handler (ZodError → VALIDATION_ERROR)
+  middlewares/auth.ts # bearer-token auth
+  routers/send.ts     # POST /send — validates the request, builds + sends the message
+```
 
 ## Local dev
 
 ```bash
-bun run dev   # wrangler dev — note: Email Service does not deliver from local
+bun run dev   # wrangler dev — the send_email binding is remote (remote: true), so env.EMAIL.send() delivers real email even when running locally
 bun run tail  # stream production logs
 ```
 
