@@ -38,14 +38,15 @@ curl -X POST https://cloudflare-email-sending.nd941z.workers.dev/send \
   -H "Authorization: Bearer $EMAIL_SENDING" \
   -H "Content-Type: application/json" \
   -d '{
-    "from_alias": "notes",
+    "from_alias": "admin",
+    "from_name": "Neeraj Dalal",
     "to": "recipient@example.com",
     "subject": "test",
     "text": "hello from cloudflare email service"
   }'
 ```
 
-Success: `{ "data": { "from": "notes@nrjdalal.com", "to": "recipient@example.com", "messageId": "..." } }`.
+Success: `{ "data": { "from": { "email": "admin@nrjdalal.com", "name": "Neeraj Dalal" }, "to": "recipient@example.com", "messageId": "..." } }`.
 
 Errors return `{ "error": { "code": "...", "message": "..." } }`:
 
